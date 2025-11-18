@@ -1,0 +1,15 @@
+# виртуальное окружение
+venv/
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# окружение и ключи
+.env
+
+# кэш Jupyter, LangChain и пр.
+*.ipynb_checkpoints
+langchain.db
