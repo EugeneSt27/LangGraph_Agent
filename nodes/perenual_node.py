@@ -13,4 +13,10 @@ class PerenualNode:
         if data is None:
             return None
 
-        return PerenualPlant.model_validate(data)
+        try:
+            return PerenualPlant.model_validate(data)
+        except Exception as e:
+            print("PERENUAL VALIDATION FAILED:", e)
+            print("RAW DATA:", data)
+            return None
+    

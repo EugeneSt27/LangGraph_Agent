@@ -1,16 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional, List
 
 
 class PerenualImage(BaseModel):
-    """Изображения из Perenual."""
     license: Optional[int] = None
     original_url: Optional[str] = None
     regular_url: Optional[str] = None
 
 
 class PerenualPlant(BaseModel):
-    """Упрощённая модель растения из Perenual."""
     id: int
     common_name: Optional[str] = None
     scientific_name: Optional[str] = None
@@ -21,3 +19,23 @@ class PerenualPlant(BaseModel):
     default_image: Optional[PerenualImage] = None
 
     model_config = {"extra": "ignore"}
+
+    @field_validator("scientific_name", mode="before")
+    def scientific_name_fix(cls, v):
+        if isinstance(v, list) and v:
+            return v[0]
+        if isinstance(v, str):
+            return v
+        return None
+
+    @field_validator("sunlight", mode="before")
+    def sunlight_fix(cls, v):
+        if v is None:
+            return None
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            if "Upgrade Plans" in v:
+                return None
+            return [v]
+        return None
