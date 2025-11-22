@@ -9,6 +9,7 @@ from nodes.planner_node import PlannerNode
 from nodes.perenual_node import PerenualNode
 from nodes.trefle_node import TrefleNode
 from nodes.translation_node import TranslationNode
+from nodes.diagnosis_node import DiagnosisNode
 
 
 async def async_main():
@@ -17,7 +18,7 @@ async def async_main():
 
     # 1) Planner
     plan = await planner.run(
-        "В горшке у спатифиллума завелись мошки и начали желтеть листья. Что делать?"
+        "В горшке в бегонии появились мошки и как будто плесень в земле. Она месяц стояла на балконе зимой, я про нее забыл"
     )
     print("Planner returned:", plan.model_dump())
 
@@ -52,6 +53,16 @@ async def async_main():
     print("Trefle:", t_data.model_dump() if t_data else None)
     print("Perenual:", p_data.model_dump() if p_data else None)
 
+    # 5) Диагностика и вызов поисковика при необходимости
+    diag = DiagnosisNode(llm)
+    diagnosis = await diag.run(
+        plan.plant_name,
+        plan.symptoms,
+        t_data.model_dump() if t_data else {},
+        p_data.model_dump() if p_data else {},
+    )
+
+    print(diagnosis.model_dump())
 
 if __name__ == "__main__":
     asyncio.run(async_main())

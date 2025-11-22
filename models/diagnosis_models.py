@@ -1,11 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from pydantic import BaseModel
+from typing import List
 
-class DiagnosisResult(BaseModel):
-    """
-    Финальный структурированный диагноз, который выносится после цикла ReAct.
-    Используется как выход DiagnosisNode, когда агент решает закончить.
-    """
-    diagnosis: str = Field(description="Краткий итоговый диагноз (например, 'Перелив' или 'Недостаток калия').")
-    recommendations: List[str] = Field(description="Список конкретных, пошаговых рекомендаций по устранению проблемы (например, ['Сократить полив до 1 раза в неделю', 'Проверить дренаж']).")
-    confidence_level: Optional[str] = Field(description="Уровень уверенности в диагнозе: 'High', 'Medium', 'Low'.")
+class DiagnosisDraft(BaseModel):
+    possible_causes: List[str]
+    recommended_actions: List[str]
+    confidence: float  # в диапазоне 0.0 - 1.0
+
+    model_config = {"extra": "ignore"}
