@@ -10,31 +10,32 @@ load_dotenv()
 TREFLE_API_KEY = os.getenv("TREFLE_API_KEY")
 PERENUAL_API_KEY = os.getenv("PERENUAL_API_KEY")
 
+
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
-    """
-    Делает запрос к Trefle и возвращает JSON первого найденного растения.
-    Использует retry, чтобы обрабатывать сетевые ошибки.
-    """
 async def fetch_trefle(plant_name: str):
     query = quote(plant_name)
-
-    url = f"https://trefle.io/api/v1/plants/search?q={query}&token={TREFLE_TOKEN}"
+    url = f"https://trefle.io/api/v1/plants/search?q={query}&token={TREFLE_API_KEY}"
 
     try:
-        r = await client.get(url, timeout=30)
-        data = r.json()
+        async with httpx.AsyncClient() as client:
+            r = await client.get(url, timeout=30)
+            r.raise_for_status()
+            data = r.json()
 
-        # если данные есть → всё готово
-        if data.get("data"):
-            return data["data"][0]
+            # если данные есть → всё готово
+            if data.get("data"):
+                return data["data"][0]
 
         # fallback — поиск по роду
         genus = plant_name.split()[0]
-        url2 = f"https://trefle.io/api/v1/plants/search?q={genus}&token={TREFLE_TOKEN}"
-        r2 = await client.get(url2, timeout=30)
-        data2 = r2.json()
-        if data2.get("data"):
-            return data2["data"][0]
+
+        url2 = f"https://trefle.io/api/v1/plants/search?q={genus}&token={TREFLE_API_KEY}"
+        async with httpx.AsyncClient() as client:
+            r2 = await client.get(url, timeout=30)
+            r2.raise_for_status()
+            data2 = r2.json()
+            if data2.get("data"):
+                return data2["data"][0]
 
         return None
     except Exception as e:

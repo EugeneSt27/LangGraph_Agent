@@ -21,7 +21,7 @@ async def async_main():
     )
     print("Planner returned:", plan.model_dump())
 
-    # 2) Перевод названия растения → латинское/scientific
+    # 2) Перевод названия растения на английский
     translator = TranslationNode(llm)
     scientific_name = await translator.run(plan.plant_name)
     print("Scientific:", scientific_name)
